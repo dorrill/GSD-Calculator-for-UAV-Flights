@@ -50,21 +50,6 @@ class Camera_Database:
     """
     # Get camera data from camera database
     return self.camera_database[camera_name]
-  
-
-# class Camera:
-#     def __init__(self,name, sensor_width_px, sensor_height_px, pixel_size_nm, focal_length_mm):
-#       """
-#       Initializes the camera class with the name, sensor width and height, pixel size and focal length.
-#       """
-#       self.name = name #Camera name
-#       self.sensor_width_px = sensor_width_px #Sensor width in pixels
-#       self.sensor_height_px = sensor_height_px #Sensor height in pixels
-#       self.pixel_size_nm = pixel_size_nm #Sensor pixel size in nanometers
-#       self.focal_length_mm = focal_length_mm #Sensor focal length in millimeters
-#     def __repr__(self):
-#       """Returns a string representation of the camera."""""
-#       return "Camera: " + self.name + " \n Sensor Width: " + str(self.sensor_width_px) + " px \n Sensor Height: " + str(self.sensor_height_px) + " px \n Pixel Size: " + str(self.pixel_size_m) + " m \n Focal Length: " + str(self.focal_length_m) + " m"
 
 class GSDCalculator:
   """
@@ -166,17 +151,35 @@ def main():
         altitude_m = prompt_altitude()
         calculate_gsd(altitude_m, camera_parameters)
 
-    
+  def trigger_altitude_calculator():
+    """
+    Triggers the Altitude calculator.
+    """
+    # Call select_camera function to get the camera and camera parameters
+    camera, camera_parameters = select_camera(camera_database)
 
-    
-    
-    
-    
+    # Continously prompt for new altitudes until the user writes B
+    while True:
+        def prompt_gsd():
+            # Promt for new altitude or to go back
+            print("Enter B to go back or a GSD [cm]: ")
+            gsd_cm = input()
+            if gsd_cm == "B":
+                trigger_altitude_calculator()
+            else:
+                gsd_cm = float(gsd_cm)
+                return gsd_cm
 
+        def calculate_alttitude(gsd_cm, camera_parameters):
+            # Calculate altitude for the given gsd and camera parameters
+            altitude_m = GSDCalculator.calculate_altitude(gsd_cm, camera_parameters["sensor_width_px"],
+                                                 camera_parameters["pixel_size_nm"], camera_parameters["focal_length_mm"])
+            # Print the altitudes in meters
+            print("Altitude: " + str(round(altitude_m, 2)) + "m" + " at GSD of: " + str(round(gsd_cm, 2)) + " cm")
 
-
-  
-  
+        gsd_cm = prompt_gsd()
+        calculate_alttitude(gsd_cm, camera_parameters)
+      
   def display_welcome_message():
     program_title = "GSD Calculator for UAV Flights"
     author_name = "21satspleb"
@@ -225,7 +228,7 @@ Program Description: {program_description}
     if user_input == "1":
       trigger_gsd_calculator()
     elif user_input == "2":
-      print("Calculating flight altitude for a given GSD...")
+      trigger_altitude_calculator()
     elif user_input == "3":
       print("Listing available cameras...")
     elif user_input == "4":
@@ -240,19 +243,3 @@ Program Description: {program_description}
     
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-# gsd_cm = GSDCalculator.calculate_gsd(100, 8192, 4.27, 35)
-# alt = GSDCalculator.calculate_altitude(gsd_cm, 8192, 4.27, 35)
-# print(gsd_cm, " - ", alt)
-
-# test_database = Camera_Database()
-
-# print(test_database.get_list_cameras())
