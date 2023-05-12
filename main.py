@@ -144,25 +144,28 @@ def main():
     # Call select_camera function to get the camera and camera parameters
     camera, camera_parameters = select_camera(camera_database)
 
-    def prompt_altitude():
-      # Promt for new altitude or to go back
-      print("Enter B to go back or a altitude: ")
-      altitude_m = input()
-      if altitude_m == "B":
-        trigger_gsd_calculator()
-      else:
-        altitude_m = float(altitude_m)
-        return altitude_m
-        
-    def calculate_gsd(altitude_m, camera_parameters):
-      # Calculate GSD for the given altitude and camera parameters
-      gsd_cm = GSDCalculator.calculate_gsd(altitude_m, camera_parameters["sensor_width_px"],
-                                           camera_parameters["pixel_size_nm"], camera_parameters["focal_length_mm"])
-      # Print the GSD in centimeters
-      print("GSD: " + str(round(gsd_cm, 2)) + "cm" + " at altitude of: " + str(round(altitude_m, 2)))
+    # Continously prompt for new altitudes until the user writes B
+    while True:
+        def prompt_altitude():
+            # Promt for new altitude or to go back
+            print("Enter B to go back or a altitude: ")
+            altitude_m = input()
+            if altitude_m == "B":
+                trigger_gsd_calculator()
+            else:
+                altitude_m = float(altitude_m)
+                return altitude_m
 
-    altitude_m = prompt_altitude()
-    calculate_gsd(altitude_m, camera_parameters)
+        def calculate_gsd(altitude_m, camera_parameters):
+            # Calculate GSD for the given altitude and camera parameters
+            gsd_cm = GSDCalculator.calculate_gsd(altitude_m, camera_parameters["sensor_width_px"],
+                                                 camera_parameters["pixel_size_nm"], camera_parameters["focal_length_mm"])
+            # Print the GSD in centimeters
+            print("GSD: " + str(round(gsd_cm, 2)) + "cm" + " at altitude of: " + str(round(altitude_m, 2)))
+
+        altitude_m = prompt_altitude()
+        calculate_gsd(altitude_m, camera_parameters)
+
     
 
     
