@@ -16,14 +16,14 @@ class Camera_Database:
       # Save camera database as .json on wkdir
       with open(os.path.join(os.getcwd(), 'camera_database.json'), 'w') as f:
         json.dump(self.camera_database, f)
-      print(f'Camera database created at {os.getcwd()}')
+      #print(f'Camera database created at {os.getcwd()}')
     else:
       # Load camera database from.json on wkdir
       with open(os.path.join(os.getcwd(), 'camera_database.json'), 'r') as f:
         self.camera_database = json.load(f)
-      print(f'Camera database loaded from {os.getcwd()}')
+      #print(f'Camera database loaded from {os.getcwd()}')
       # List camaras in camera database
-      print(f'Cameras in database: {list(self.camera_database.keys())}')
+      #print(f'Cameras in database: {list(self.camera_database.keys())}')
   
   def add_camera(self, camera_name, sensor_width_px, sensor_height_px, pixel_size_nm, focal_length_mm):
     """
@@ -121,6 +121,36 @@ def main():
     # Print selected camera name and its parameters
     print("Selected camera: " + camera + " - " + str(camera_parameters))
     return camera, camera_parameters    
+
+  def list_cameras(camera_database):
+    # List the available camera and prompt the user to select one
+    camera_list = camera_database.get_list_cameras()
+    # Print a numbered list of the cameras in camera_list  
+    print("Camera List:")
+    for i in range(len(camera_list)):
+      print(str(i) + ": " + camera_list[i])      
+    # Prompt the user to select a camera
+    camera_index = input("Any key for back: ")    
+    # Validate user input to make sure its a possitive integer
+    display_menu()
+
+  def add_cam(camera_database):
+    # Prompt the user to enter camera name
+    camera_name = input("Enter camera name: ")
+    # Prompt the user to enter sensor width in pixels
+    sensor_width_px = int(input("Enter sensor width in pixels: "))
+    # Prompt the user to enter sensor_heigh in pixels
+    sensor_height_px = int(input("Enter sensor height in pixels: "))
+    # Prompt the user to enter pixel size in nanometers
+    pixel_size_nm = float(input("Enter pixel size in nanometers: "))
+    #Promt the user to enter focal length in millimeters
+    focal_length_mm = float(input("Enter focal length in millimeters: "))
+    
+    # Add camera to database
+    camera_database.add_camera(camera_name, sensor_width_px, sensor_height_px, pixel_size_nm, focal_length_mm)
+    # Print success message
+    print("Camera added successfully.")
+    display_menu()
   
   def trigger_gsd_calculator():
     """
@@ -230,9 +260,9 @@ Program Description: {program_description}
     elif user_input == "2":
       trigger_altitude_calculator()
     elif user_input == "3":
-      print("Listing available cameras...")
+      list_cameras(camera_database)
     elif user_input == "4":
-      print("Adding a new camera...")
+      add_cam(camera_database)
     else:
       print("Invalid choice.")
       display_menu()  
