@@ -1,0 +1,5 @@
+# Idea 
+
+- Find out what parameters I need from the user to calculate the GSD 
+- Create a camera class
+- Create a User interface class 
