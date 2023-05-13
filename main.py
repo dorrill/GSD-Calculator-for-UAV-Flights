@@ -97,6 +97,44 @@ def main():
   # Initialize camera database object
   camera_database = Camera_Database()
 
+  def validate_input(user_input, min_value=None, max_value=None, expected_type=None):
+    """
+    Validates the user input.
+
+    :param user_input: User's input
+    :param min_value: The minimum value that the input should have
+    :param max_value: The maximum value that the input should have
+    :param expected_types: The expected types of the input
+    :return: True if the input is valid, False otherwise
+    """
+
+    if expected_type is None:
+        expected_type = [float, int]
+
+    is_valid = False
+    for expected_type in expected_type:
+        try:
+            value = expected_type(user_input)
+            is_valid = True
+
+            if min_value is not None and value < min_value:
+                print(f"Invalid input. The value should be greater than or equal to {min_value}.")
+                return False
+
+            if max_value is not None and value > max_value:
+                print(f"Invalid input. The value should be less than or equal to {max_value}.")
+                return False
+
+        except ValueError:
+            continue
+
+    if not is_valid:
+        print("Invalid input. Please enter a valid number.")
+        return False
+    return True
+
+
+
   def select_camera(camera_database):
     # List the available camera and prompt the user to select one
     camera_list = camera_database.get_list_cameras()
@@ -109,8 +147,11 @@ def main():
     # Validate user input to make sure its a possitive integer
     if camera_index == "B":
       display_menu()
-    else:
+    if camera_index.isdigit():
       camera_index = int(camera_index)      
+    else:
+      print("Invalid input. Please enter a valid number.")
+      select_camera(camera_database)     
     if camera_index < 0 or camera_index >= len(camera_list):
       print("Invalid camera selection.")
       select_camera(camera_database) 
@@ -135,16 +176,35 @@ def main():
     display_menu()
 
   def add_cam(camera_database):
+    is_valid = False    
     # Prompt the user to enter camera name
-    camera_name = input("Enter camera name: ")
+    while is_valid == False: 
+      camera_name = input("Enter camera name: ")
+      is_valid = validate_input(camera_name, expected_type=[str])
     # Prompt the user to enter sensor width in pixels
-    sensor_width_px = int(input("Enter sensor width in pixels: "))
+    is_valid = False
+    while is_valid == False: 
+      sensor_width_px = input("Enter sensor width in pixels: ")
+      is_valid = validate_input(sensor_width_px, min_value=1, max_value=100000, expected_type=[int])
+      sensor_width_px = int(sensor_width_px)
     # Prompt the user to enter sensor_heigh in pixels
-    sensor_height_px = int(input("Enter sensor height in pixels: "))
+    is_valid = False
+    while is_valid == False: 
+      sensor_height_px = input("Enter sensor height in pixels: ")
+      is_valid = validate_input(sensor_height_px, min_value=1, max_value=100000, expected_type=[int])
+      sensor_height_px = int(sensor_height_px)
     # Prompt the user to enter pixel size in nanometers
-    pixel_size_nm = float(input("Enter pixel size in nanometers: "))
+    is_valid = False
+    while is_valid == False: 
+      pixel_size_nm = input("Enter pixel size in nanometers: ")
+      is_valid = validate_input(pixel_size_nm, min_value=1, max_value=100000, expected_type=[int,float])
+      pixel_size_nm = float(pixel_size_nm)
     #Promt the user to enter focal length in millimeters
-    focal_length_mm = float(input("Enter focal length in millimeters: "))
+    is_valid = False
+    while is_valid == False: 
+      focal_length_mm = input("Enter focal length in millimeters: ")
+      is_valid = validate_input(focal_length_mm, min_value=1, max_value=1000, expected_type=[int,float])
+      focal_length_mm = float(focal_length_mm)
     
     # Add camera to database
     camera_database.add_camera(camera_name, sensor_width_px, sensor_height_px, pixel_size_nm, focal_length_mm)
@@ -167,16 +227,24 @@ def main():
             altitude_m = input()
             if altitude_m == "B":
                 trigger_gsd_calculator()
-            else:
+            if altitude_m.isdigit():
                 altitude_m = float(altitude_m)
+                # Validate user input to make sure its a positive float
+                if not validate_input(altitude_m, min_value=0, max_value=10000, expected_type=[float]):
+                  prompt_altitude()                
                 return altitude_m
+            else:
+                print("Invalid input.")
+                prompt_altitude()
 
         def calculate_gsd(altitude_m, camera_parameters):
             # Calculate GSD for the given altitude and camera parameters
             gsd_cm = GSDCalculator.calculate_gsd(altitude_m, camera_parameters["sensor_width_px"],
-                                                 camera_parameters["pixel_size_nm"], camera_parameters["focal_length_mm"])
+                                                 camera_parameters["pixel_size_nm"],     
+                                                 camera_parameters["focal_length_mm"])
             # Print the GSD in centimeters
-            print("GSD: " + str(round(gsd_cm, 2)) + "cm" + " at altitude of: " + str(round(altitude_m, 2)))
+            print("GSD: " + str(round(gsd_cm, 2)) + "cm" + " at altitude of: " + str(round(altitude_m, 
+                                                                                           2)))
 
         altitude_m = prompt_altitude()
         calculate_gsd(altitude_m, camera_parameters)
@@ -196,10 +264,16 @@ def main():
             gsd_cm = input()
             if gsd_cm == "B":
                 trigger_altitude_calculator()
-            else:
+            if gsd_cm.isdigit():
                 gsd_cm = float(gsd_cm)
+                # Validate user input to make sure its a positive float
+                if not validate_input(gsd_cm, min_value=0, max_value=1000, expected_type=[float]):
+                  prompt_gsd()                
                 return gsd_cm
-
+            else:
+                print("Invalid input.")
+                prompt_gsd()
+              
         def calculate_alttitude(gsd_cm, camera_parameters):
             # Calculate altitude for the given gsd and camera parameters
             altitude_m = GSDCalculator.calculate_altitude(gsd_cm, camera_parameters["sensor_width_px"],
