@@ -1,5 +1,6 @@
 # GSD Calculator for UAV Flights
 This is a Python script that calculates the Ground Sampling Distance (GSD) for an Unmanned Aerial Vehicle (UAV). The GSD is the distance between two consecutive pixels on the ground, and it is an important parameter for capturing high-quality aerial images. This script allows you to calculate the GSD based on a set of camera parameters or the flight altitude for a given GSD.
+![image](https://github.com/21satspleb/GSD-Calculator-for-UAV-Flights/assets/17071961/05de03cd-2167-4eee-a9f9-2524f97c1cd8)
 
 ## Features
 The GSD Calculator has the following features:
