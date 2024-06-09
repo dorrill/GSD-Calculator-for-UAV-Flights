@@ -6,7 +6,7 @@ import json
 
 # Constants
 
-uM_TO_M = 1e-6  # micrometers to meters --> Originally had "nm" - know your metric prefixes folks!
+uM_TO_M = 1e-6  # nanometers to meters --> #Ryan's note - Bro mixed up um and nm....whoops
 MM_TO_M = 1e-3  # millimeters to meters
 CM_TO_M = 100  # millimeters to meters
 
@@ -388,10 +388,8 @@ def trigger_altitude_calculator(camera_database):
   """
   # Call select_camera function to get the camera and camera parameters
   camera, camera_parameters = select_camera(camera_database)
-
-  # Continously prompt for new altitudes until the user writes B
-  while True:
-      def prompt_gsd():
+  stillWorking = 'y'
+  while stillWorking.lower() == 'y':
           """
       Prompts the user for a new GSD or to go back.
 
@@ -400,21 +398,24 @@ def trigger_altitude_calculator(camera_database):
 
       """
           # Promt for new altitude or to go back
-          print("Enter B to go back or a GSD [cm]: ")
+          print("Enter a GSD [cm] or B to go back: ")
           gsd_cm = input()
-          if gsd_cm.lower() == "b":
-              trigger_altitude_calculator(camera_database)
-          if gsd_cm.isdigit():
+          if gsd_cm.lower() == "b" or gsd_cm.lower() == "q":
+              stillWorking = 'n'
+          elif gsd_cm.isdigit():
               gsd_cm = float(gsd_cm)
               # Validate user input to make sure its a positive float
-              if not validate_input(gsd_cm, min_value=0, max_value=1000, expected_types=[float]):
-                return prompt_gsd()
-              return gsd_cm
+              while not validate_input(gsd_cm, min_value=0, max_value=10000, expected_types=[float]):
+                print("Invalid GSD... value should be in meters")
+                print("Enter a GSD [cm] or B to go back: ")
+                gsd_cm = input()
+
+              calculate_alttitude(gsd_cm, camera_parameters)
           else:
               print("Invalid input.")
               return prompt_gsd()
 
-      def calculate_alttitude(gsd_cm, camera_parameters):
+def calculate_alttitude(gsd_cm, camera_parameters):
         """
       Calculates the altitude for the given GSD and camera parameters.
 
@@ -431,9 +432,6 @@ def trigger_altitude_calculator(camera_database):
                                              camera_parameters["pixel_size_um"], camera_parameters["focal_length_mm"])
         # Print the altitudes in meters
         print("Altitude: " + str(round(altitude_m, 2)) + "m" + " at GSD of: " + str(round(gsd_cm, 2)) + " cm")
-
-      gsd_cm = prompt_gsd()
-      calculate_alttitude(gsd_cm, camera_parameters)
 
 def display_welcome_message():
   """
